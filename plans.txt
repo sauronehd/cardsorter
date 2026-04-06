@@ -1,0 +1,12 @@
+Use camera  - Picamera2
+OCR
+Worms to lift things
+Use "hairs" on the rollers to help
+
+Part List:
+
+Engines: 8
+Worm coils: 4
+Camera: 1
+Raspberry pi: 1
+Wires, both male and female: many
