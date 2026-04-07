@@ -1,14 +1,7 @@
 import pytesseract
 from PIL import Image
-import os
-import os
-import sys
-if os.name == "posix":
-    print("Importing pi camera2")
-    from picamera2 import Picamera2
-else:
-    print("Not importing picamera2, quitting")
-    sys.exit(1)
+from picamera2 import Picamera2
+
 
 try:
     wait = input("Enter to start")
