@@ -1,9 +1,16 @@
 from ocrfunc import ocr
-from picamera2 import Picamera2
+from picamera2 import Picamera2, Preview
 from PIL import Image
-
+import time
 
 camera = Picamera2()
-camera.start_and_capture_file("temp.jpg")
+picam2 = Picamera2()
+camera_config = picam2.create_preview_configuration()
+picam2.configure(camera_config)
+picam2.start_preview(Preview.QTGL)
+picam2.start()
+time.sleep(2)
+picam2.capture_file("temp.jpg")
+
 image = Image.open("temp.jpg")
 print(f"The image text is:{ocr(image)}")
