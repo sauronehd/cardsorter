@@ -1,3 +1,3 @@
 from ocrfunc import ocr
 
-print(ocr())
+print(f"The image text is:{ocr()}")
