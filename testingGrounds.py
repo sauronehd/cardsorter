@@ -1,10 +1,13 @@
 from algorithim import *
 import pytesseract
+from ocrfunc import *
 from PIL import Image
-image = Image.open("ROS019.png")
+
 numbers = [["0","o"],["1","i"],["2","s"],["3","e"],["4","r"],["5","s"],["6","p"],["7","f"],["8","b"],["9","p"]]
-#text = pytesseract.image_to_string(image)
-text = input("Enter your text: ")
+
+
+
+text = ocr()
 print(f"text is : {text}")
 rawCardSet = (text[0:3])
 print(f"rawCardSet is {rawCardSet}")
