@@ -13,6 +13,6 @@ def ocr():
         image = Image.open("temp.jpg")
         text = pytesseract.image_to_string(image)
         return text
-    except:
-        print("Error, possibly not using linux/pi")
+    except Exception as e:
+        print(f"Error: {e}")
         return False
