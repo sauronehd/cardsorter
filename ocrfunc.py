@@ -1,16 +1,11 @@
 import pytesseract
-from PIL import Image
-from picamera2 import Picamera2
 
 
 
 
 
-def ocr():
+def ocr(image):
     try:
-        camera = Picamera2()
-        camera.start_and_capture_file("temp.jpg")
-        image = Image.open("temp.jpg")
         text = pytesseract.image_to_string(image)
         return text
     except Exception as e:
