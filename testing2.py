@@ -13,4 +13,5 @@ time.sleep(2)
 picam2.capture_file("temp.jpg")
 
 image = Image.open("temp.jpg")
+print(image.shape)
 print(f"The image text is:{ocr(image)}")
