@@ -11,7 +11,7 @@ picam2.start()
 focused = picam2.autofocus_cycle()
 while not focused:
     focused = picam2.autofocus_cycle()
-
+print(f"focused is {focused}")
 time.sleep(2)
 picam2.capture_file("temp.jpg")
 
