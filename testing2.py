@@ -8,7 +8,10 @@ camera_config = picam2.create_preview_configuration()
 picam2.configure(camera_config)
 picam2.start_preview(Preview.QTGL)
 picam2.start()
-picam2.autofocus_cycle()
+focused = picam2.autofocus_cycle()
+while not focused:
+    focused = picam2.autofocus_cycle()
+
 time.sleep(2)
 picam2.capture_file("temp.jpg")
 
