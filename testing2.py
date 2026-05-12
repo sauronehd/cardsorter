@@ -12,7 +12,7 @@ def wait_for_file(path, timeout=5):
             return True
         time.sleep(0.1)
     return False
-
+#helo
 picam2 = Picamera2()
 camera_config = picam2.create_preview_configuration()
 picam2.configure(camera_config)
