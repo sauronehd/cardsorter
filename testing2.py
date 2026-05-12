@@ -20,8 +20,14 @@ picam2.configure(camera_config)
 picam2.start()
 
 focused = picam2.autofocus_cycle()
+i =0
 while not focused:
+    print("Tyring to autofoucs")
     focused = picam2.autofocus_cycle()
+    i = i + 1
+    if i > 10:
+        break
+
 print(f"focused is {focused}")
 
 time.sleep(2)
