@@ -14,7 +14,7 @@ def wait_for_file(path, timeout=5):
     return False
 #helo
 picam2 = Picamera2()
-camera_config = picam2.create_preview_configuration()
+camera_config = picam2.create_still_configuration()
 picam2.configure(camera_config)
 #picam2.start_preview(Preview.QTGL)
 picam2.start()
