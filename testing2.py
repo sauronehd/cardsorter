@@ -16,7 +16,7 @@ def wait_for_file(path, timeout=5):
 picam2 = Picamera2()
 camera_config = picam2.create_preview_configuration()
 picam2.configure(camera_config)
-picam2.start_preview(Preview.QTGL)
+#picam2.start_preview(Preview.QTGL)
 picam2.start()
 
 focused = picam2.autofocus_cycle()
@@ -29,7 +29,7 @@ picam2.capture_file("temp.jpg")
 wait_for_file("temp.jpg")
 
 # Use consistent filename
-img = cv2.imread("temp.jpg", 0)  # ✅ correct filename
+img = cv2.imread("temp.jpg", 0)
 if img is None:
     print("Image failed to load!")
 else:

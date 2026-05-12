@@ -1,9 +1,5 @@
 import pytesseract
 
-
-
-
-
 def ocr(image):
     try:
         text = pytesseract.image_to_string(image)
