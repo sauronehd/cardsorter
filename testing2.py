@@ -20,7 +20,7 @@ camera_config = picam2.create_still_configuration(
 picam2.configure(camera_config)
 #picam2.start_preview(Preview.QTGL)
 picam2.start()
-
+picam2.set_controls({"ExposureTime": 10000})  # 1/100 sec
 focused = picam2.autofocus_cycle()
 i =0
 while not focused:
