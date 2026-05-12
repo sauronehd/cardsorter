@@ -46,4 +46,6 @@ else:
 
     # Pass the preprocessed image to OCR, not the original
     text = pytesseract.image_to_string(thresh)
-    print(f"The image text is: {text}")
+    print(f"The image text is: {text} using thresh")
+    text = pytesseract.image_to_string(img)
+    print(f"The image text is: {text} using temp")
