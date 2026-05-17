@@ -19,7 +19,7 @@ camera_config = picam2.create_still_configuration(
 )
 picam2.configure(camera_config)
 picam2.start()
-
+#force push
 # Let camera warm up and apply controls
 picam2.set_controls({
     "ExposureTime": 10000,  # 1/100 sec
