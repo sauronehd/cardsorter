@@ -51,7 +51,7 @@ else:
 
     # Crop out dark bands top/bottom and edges
     h, w = gray.shape
-    gray = gray[int(h*0.25):int(h*0.75), int(w*0.1):int(w*0.9)]
+    gray = gray[int(h*0.40):int(h*0.60), int(w*0.1):int(w*0.2)]
 
     # CLAHE to normalize uneven lighting
     clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
