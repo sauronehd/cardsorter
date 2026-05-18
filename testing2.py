@@ -1,8 +1,7 @@
 import os
 import time
 import cv2
-from PIL import Image
-from picamera2 import Picamera2, Preview
+from picamera2 import Picamera2
 import pytesseract
 
 def wait_for_file(path, timeout=5):
@@ -14,21 +13,17 @@ def wait_for_file(path, timeout=5):
     return False
 
 picam2 = Picamera2()
-camera_config = picam2.create_still_configuration(
-    main={"size": (4608, 2592)}
-)
+camera_config = picam2.create_still_configuration(main={"size": (4608, 2592)})
 picam2.configure(camera_config)
 picam2.start()
-#force push
-# Let camera warm up and apply controls
+
 picam2.set_controls({
-    "ExposureTime": 10000,  # 1/100 sec
+    "ExposureTime": 10000,
     "Sharpness": 2.0,
     "Contrast": 1.2
 })
-time.sleep(1)  # Let controls settle
+time.sleep(1)
 
-# Autofocus
 for i in range(10):
     if picam2.autofocus_cycle():
         print("Autofocus succeeded")
@@ -41,31 +36,41 @@ time.sleep(2)
 picam2.capture_file("temp.jpg")
 wait_for_file("temp.jpg")
 
-# Preprocessing and OCR
 img = cv2.imread("temp.jpg")
 if img is None:
     print("Image failed to load!")
 else:
-    # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # Crop out dark bands top/bottom and edges
+    # --- Crop: save the raw crop first to verify framing ---
     h, w = gray.shape
-    gray = gray[int(h * 0.5):int(h * 0.6), int(w * 0.3):int(w * 0.5)]    # CLAHE to normalize uneven lighting
-    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
-    gray = clahe.apply(gray)
+    crop = gray[int(h * 0.5):int(h * 0.6), int(w * 0.3):int(w * 0.5)]
+    cv2.imwrite("debug_crop.png", crop)  # inspect this first!
 
-    # Adaptive threshold - handles local lighting variation
+    # Upscale 2x before processing
+    crop = cv2.resize(crop, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+
+    # Denoise BEFORE thresholding
+    denoised = cv2.fastNlMeansDenoising(crop, h=20)
+
+    # CLAHE for uneven lighting
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+    equalized = clahe.apply(denoised)
+
+    # Threshold
     thresh = cv2.adaptiveThreshold(
-        gray, 255,
+        equalized, 255,
         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
         cv2.THRESH_BINARY,
-        31,  # block size
-        10   # constant subtracted from mean
+        31, 10
     )
+
+    # Invert if background is dark (check mean pixel value)
+    if cv2.mean(thresh)[0] < 127:
+        thresh = cv2.bitwise_not(thresh)
 
     cv2.imwrite("thresh.png", thresh)
 
-    # OCR with better config
-    text = pytesseract.image_to_string(thresh, config="--psm 6")
+    # Single line mode since it's a title/banner
+    text = pytesseract.image_to_string(thresh, config="--psm 7 --oem 3")
     print(f"OCR result:\n{text}")
