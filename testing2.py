@@ -42,15 +42,15 @@ if img is None:
 else:
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # --- Crop: save the raw crop first to verify framing ---
+    # Initial crop to rough region of interest
     h, w = gray.shape
-    crop = gray[int(h * 0.5):int(h * 0.6), int(w * 0.3):int(w * 0.5)]
-    cv2.imwrite("debug_crop.png", crop)  # inspect this first!
+    crop = gray[int(h * 0.5):int(h * 0.6), int(w * 0.3):int(w * 0.75)]
+    cv2.imwrite("debug_crop.png", crop)
 
-    # Upscale 2x before processing
+    # Upscale 2x
     crop = cv2.resize(crop, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
 
-    # Denoise BEFORE thresholding
+    # Denoise before thresholding
     denoised = cv2.fastNlMeansDenoising(crop, h=20)
 
     # CLAHE for uneven lighting
@@ -65,12 +65,37 @@ else:
         31, 10
     )
 
-    # Invert if background is dark (check mean pixel value)
+    # Invert if background is dark
     if cv2.mean(thresh)[0] < 127:
         thresh = cv2.bitwise_not(thresh)
 
-    cv2.imwrite("thresh.png", thresh)
+    # --- Auto-crop: remove black borders by finding content pixels ---
+    _, binary = cv2.threshold(equalized, 30, 255, cv2.THRESH_BINARY)
+    coords = cv2.findNonZero(binary)
 
-    # Single line mode since it's a title/banner
-    text = pytesseract.image_to_string(thresh, config="--psm 7 --oem 3")
-    print(f"OCR result:\n{text}")
+    if coords is None:
+        print("No content found after thresholding — check debug_crop.png")
+    else:
+        x, y, cw, ch = cv2.boundingRect(coords)
+
+        # Add padding so letters aren't right at the edge
+        pad = 10
+        y1 = max(0, y - pad)
+        y2 = min(thresh.shape[0], y + ch + pad)
+        x1 = max(0, x - pad)
+        x2 = min(thresh.shape[1], x + cw + pad)
+
+        text_region = thresh[y1:y2, x1:x2]
+        cv2.imwrite("text_region.png", text_region)
+
+        # Try multiple PSM modes, use first non-empty result
+        best = ""
+        for psm in [7, 6, 11, 3]:
+            result = pytesseract.image_to_string(
+                text_region, config=f"--psm {psm} --oem 3"
+            ).strip()
+            print(f"PSM {psm}: '{result}'")
+            if result and not best:
+                best = result
+
+        print(f"\nBest OCR result: '{best}'")
